@@ -10,30 +10,6 @@ import { deleteDataPegawai, getDataPegawai, getMe } from '../../../../config/red
 import { BiSearch } from 'react-icons/bi';
 import { MdKeyboardDoubleArrowLeft, MdKeyboardDoubleArrowRight, MdOutlineKeyboardArrowDown } from 'react-icons/md';
 
-const exportToCSV = () => {
-    const headers = ['No', 'NIK', 'Nama Pegawai', 'Jenis Kelamin', 'Designation', 'Status', 'Tanggal Masuk'];
-    const rows = filteredDataPegawai.map((data, index) => [
-        index + 1,
-        data.nik,
-        data.nama_pegawai,
-        data.jenis_kelamin,
-        data.designation || '-',
-        data.status,
-        data.tanggal_masuk ? new Date(data.tanggal_masuk).toLocaleDateString('en-GB') : '-'
-    ]);
-
-    const csvContent = [headers, ...rows]
-        .map(row => row.map(cell => `"${cell}"`).join(','))
-        .join('\n');
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'data_pegawai.csv';
-    link.click();
-    URL.revokeObjectURL(url);
-};
 const ITEMS_PER_PAGE = 4;
 
 const DataPegawai = () => {
@@ -46,7 +22,6 @@ const DataPegawai = () => {
     const { dataPegawai } = useSelector((state) => state.dataPegawai);
 
     const totalPages = Math.ceil(dataPegawai.length / ITEMS_PER_PAGE);
-
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
 
@@ -61,23 +36,38 @@ const DataPegawai = () => {
     });
 
     const goToPrevPage = () => {
-        if (currentPage > 1) {
-            setCurrentPage((prev) => prev - 1);
-        }
+        if (currentPage > 1) setCurrentPage((prev) => prev - 1);
     };
 
     const goToNextPage = () => {
-        if (currentPage < totalPages) {
-            setCurrentPage((prev) => prev + 1);
-        }
+        if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
     };
 
-    const handleSearch = (event) => {
-        setSearchKeyword(event.target.value);
-    };
+    const handleSearch = (event) => setSearchKeyword(event.target.value);
+    const handleFilterStatus = (event) => setFilterStatus(event.target.value);
 
-    const handleFilterStatus = (event) => {
-        setFilterStatus(event.target.value);
+    // LF-104: CSV Export
+    const exportToCSV = () => {
+        const headers = ['No', 'NIK', 'Nama Pegawai', 'Jenis Kelamin', 'Designation', 'Status', 'Tanggal Masuk'];
+        const rows = filteredDataPegawai.map((data, index) => [
+            index + 1,
+            data.nik,
+            data.nama_pegawai,
+            data.jenis_kelamin,
+            data.designation || '-',
+            data.status,
+            data.tanggal_masuk ? new Date(data.tanggal_masuk).toLocaleDateString('en-GB') : '-'
+        ]);
+        const csvContent = [headers, ...rows]
+            .map(row => row.map(cell => `"${cell}"`).join(','))
+            .join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'data_pegawai.csv';
+        link.click();
+        URL.revokeObjectURL(url);
     };
 
     const onDeletePegawai = (id) => {
@@ -110,23 +100,16 @@ const DataPegawai = () => {
         dispatch(getDataPegawai(startIndex, endIndex));
     }, [dispatch, startIndex, endIndex]);
 
-    useEffect(() => {
-        dispatch(getMe());
-    }, [dispatch]);
+    useEffect(() => { dispatch(getMe()); }, [dispatch]);
 
     useEffect(() => {
-        if (isError) {
-            navigate('/login');
-        }
-        if (user && user.hak_akses !== 'admin') {
-            navigate('/dashboard');
-        }
+        if (isError) navigate('/login');
+        if (user && user.hak_akses !== 'admin') navigate('/dashboard');
     }, [isError, user, navigate]);
 
     const paginationItems = () => {
         const items = [];
         const maxVisiblePages = 5;
-
         const startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
         const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
 
@@ -135,62 +118,39 @@ const DataPegawai = () => {
                 <button
                     key={page}
                     onClick={() => setCurrentPage(page)}
-                    className={`py-2 px-4 border border-gray-2 text-black font-semibold dark:text-white dark:border-strokedark ${currentPage === page ? 'bg-primary text-white hover:bg-primary dark:bg-primary dark:hover:bg-primary' : 'hover:bg-gray-2 dark:hover:bg-stroke'
-                        } rounded-lg`}
+                    className={`py-2 px-4 border border-gray-2 text-black font-semibold dark:text-white dark:border-strokedark ${currentPage === page ? 'bg-primary text-white hover:bg-primary dark:bg-primary dark:hover:bg-primary' : 'hover:bg-gray-2 dark:hover:bg-stroke'} rounded-lg`}
                 >
                     {page}
                 </button>
             );
         }
-
         if (startPage > 2) {
-            items.unshift(
-                <p
-                    key="start-ellipsis"
-                    className="py-2 px-4 border border-gray-2 dark:bg-transparent text-black font-medium bg-gray dark:border-strokedark dark:text-white"
-                >
-                    ...
-                </p>
-            );
+            items.unshift(<p key="start-ellipsis" className="py-2 px-4 border border-gray-2 dark:bg-transparent text-black font-medium bg-gray dark:border-strokedark dark:text-white">...</p>);
         }
-
         if (endPage < totalPages - 1) {
-            items.push(
-                <p
-                    key="end-ellipsis"
-                    className="py-2 px-4 border border-gray-2 dark:bg-transparent text-black font-medium bg-gray dark:border-strokedark dark:text-white"
-                >
-                    ...
-                </p>
-            );
+            items.push(<p key="end-ellipsis" className="py-2 px-4 border border-gray-2 dark:bg-transparent text-black font-medium bg-gray dark:border-strokedark dark:text-white">...</p>);
         }
-
         return items;
     };
 
     return (
         <Layout>
             <Breadcrumb pageName="Data Pegawai" />
-          <div className="flex gap-3 mb-4">
-    <Link to="/data-pegawai/form-data-pegawai/add">
-        <ButtonOne>
-            <span>Tambah Pegawai</span>
-            <span><FaPlus /></span>
-        </ButtonOne>
-    </Link>
-    <button
-        onClick={exportToCSV}
-        className="inline-flex items-center gap-2 rounded bg-success py-2 px-4 text-white font-medium hover:bg-opacity-90"
-    >
-        Download CSV
-    </button>
-</div>
-                    <span>Tambah Pegawai</span>
-                    <span>
-                        <FaPlus />
-                    </span>
-                </ButtonOne>
-            </Link>
+            <div className="flex gap-3 mb-4">
+                <Link to="/data-pegawai/form-data-pegawai/add">
+                    <ButtonOne>
+                        <span>Tambah Pegawai</span>
+                        <span><FaPlus /></span>
+                    </ButtonOne>
+                </Link>
+                <button
+                    onClick={exportToCSV}
+                    className="inline-flex items-center gap-2 rounded bg-success py-2 px-4 text-white font-medium hover:bg-opacity-90"
+                >
+                    Download CSV
+                </button>
+            </div>
+
             <div className="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1 mt-6">
                 <div className="flex justify-between items-center mt-4 flex-col md:flex-row md:justify-between">
                     <div className="relative flex-1 md:mr-2 mb-4 md:mb-0">
@@ -217,14 +177,12 @@ const DataPegawai = () => {
                             onChange={handleSearch}
                             className="rounded-lg border-[1.5px] border-stroke bg-transparent py-2 pl-10 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary left-0"
                         />
-                        <span className="absolute left-2 py-3 text-xl">
-                            <BiSearch />
-                        </span>
+                        <span className="absolute left-2 py-3 text-xl"><BiSearch /></span>
                     </div>
                 </div>
 
                 <div className="max-w-full overflow-x-auto py-4">
-                    <table className="w-full table-auto">
+                    <table className="w-full table-auto" style={{ minWidth: '700px' }}>
                         <thead>
                             <tr className="bg-gray-2 text-left dark:bg-meta-4">
                                 <th className="py-4 px-4 font-medium text-black dark:text-white xl:pl-11">No</th>
@@ -240,59 +198,53 @@ const DataPegawai = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredDataPegawai.slice(startIndex, endIndex).map((data, index) => {
-                                return (
-                                    <tr key={data.id}>
-                                        <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                                            <p className="text-black dark:text-white text-center">{startIndex + index + 1}</p>
-                                        </td>
-                                        <td className="border-b border-[#eee] py-5 px-4 pl-9 dark:border-strokedark">
-                                            <div className="h-12.5 w-15">
-                                                <div className="rounded-full overflow-hidden">
-                                                    <img src={`http://localhost:5000/images/${data.photo}`} alt="Photo Profil" />
-                                                </div>
+                            {filteredDataPegawai.slice(startIndex, endIndex).map((data, index) => (
+                                <tr key={data.id}>
+                                    <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                                        <p className="text-black dark:text-white text-center">{startIndex + index + 1}</p>
+                                    </td>
+                                    <td className="border-b border-[#eee] py-5 px-4 pl-9 dark:border-strokedark">
+                                        <div className="h-12.5 w-15">
+                                            <div className="rounded-full overflow-hidden">
+                                                <img src={`http://localhost:5000/images/${data.photo}`} alt="Photo Profil" />
                                             </div>
-                                        </td>
-                                        <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                                            <p className="text-black dark:text-white text-center">{data.nik}</p>
-                                        </td>
-                                        <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                                            <p className="text-black dark:text-white">{data.nama_pegawai}</p>
-                                        </td>
-                                        <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                                            <p className="text-black dark:text-white">{data.jenis_kelamin}</p>
-                                        </td>
-                                        <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                                            <p className="text-black dark:text-white">{data.tanggal_masuk}</p>
-                                        </td>
-                                        <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                                          <p className="text-black dark:text-white">
-  {data.tanggal_masuk ? new Date(data.tanggal_masuk).toLocaleDateString('en-GB') : '-'}
-</p>
-                                        </td>
-                                        <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                                            <p className="text-black dark:text-white">{data.hak_akses}</p>
-                                        </td>
-                                        <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                                            <p className="text-black dark:text-white">{data.designation}</p>
-                                        </td>
-                                        <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                                            <div className="flex items-center space-x-3.5">
-                                                <Link
-                                                    to={`/data-pegawai/form-data-pegawai/edit/${data.id}`}
-                                                    className="hover:text-black">
-                                                    <FaRegEdit className="text-primary text-xl hover:text-black dark:hover:text-white" />
-                                                </Link>
-                                                <button
-                                                    onClick={() => onDeletePegawai(data.id)}
-                                                    className="hover:text-black">
-                                                    <BsTrash3 className="text-danger text-xl hover:text-black dark:hover:text-white" />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                );
-                            })}
+                                        </div>
+                                    </td>
+                                    <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                                        <p className="text-black dark:text-white text-center">{data.nik}</p>
+                                    </td>
+                                    <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                                        <p className="text-black dark:text-white">{data.nama_pegawai}</p>
+                                    </td>
+                                    <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                                        <p className="text-black dark:text-white">{data.jenis_kelamin}</p>
+                                    </td>
+                                    <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                                        <p className="text-black dark:text-white">
+                                            {data.tanggal_masuk ? new Date(data.tanggal_masuk).toLocaleDateString('en-GB') : '-'}
+                                        </p>
+                                    </td>
+                                    <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                                        <p className="text-black dark:text-white">{data.status}</p>
+                                    </td>
+                                    <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                                        <p className="text-black dark:text-white">{data.hak_akses}</p>
+                                    </td>
+                                    <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                                        <p className="text-black dark:text-white">{data.designation}</p>
+                                    </td>
+                                    <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                                        <div className="flex items-center space-x-3.5">
+                                            <Link to={`/data-pegawai/form-data-pegawai/edit/${data.id}`} className="hover:text-black">
+                                                <FaRegEdit className="text-primary text-xl hover:text-black dark:hover:text-white" />
+                                            </Link>
+                                            <button onClick={() => onDeletePegawai(data.id)} className="hover:text-black">
+                                                <BsTrash3 className="text-danger text-xl hover:text-black dark:hover:text-white" />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                 </div>
@@ -309,7 +261,7 @@ const DataPegawai = () => {
                             onClick={goToPrevPage}
                             className="py-2 px-6 rounded-lg border border-primary text-primary font-semibold hover:bg-primary hover:text-white dark:text-white dark:border-primary dark:hover:bg-primary dark:hover:text-white disabled:opacity-50"
                         >
-                            < MdKeyboardDoubleArrowLeft />
+                            <MdKeyboardDoubleArrowLeft />
                         </button>
                         {paginationItems()}
                         <button
@@ -317,7 +269,7 @@ const DataPegawai = () => {
                             onClick={goToNextPage}
                             className="py-2 px-6 rounded-lg border border-primary text-primary font-semibold hover:bg-primary hover:text-white dark:text-white dark:border-primary dark:hover:bg-primary dark:hover:text-white disabled:opacity-50"
                         >
-                            < MdKeyboardDoubleArrowRight />
+                            <MdKeyboardDoubleArrowRight />
                         </button>
                     </div>
                 </div>
