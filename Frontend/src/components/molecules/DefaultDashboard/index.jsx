@@ -81,7 +81,7 @@ const DefaultDashboard = () => {
                                 </h2>
                                 <h2 className="font-medium mb-4 block text-black dark:text-white">
                                     <span className="inline-block w-32 md:w-40">Tanggal Masuk</span>
-                                    <span className="inline-block w-7">:</span>{dataPegawai.tanggal_masuk}
+                                    <span className="inline-block w-7">:</span>{dataPegawai.tanggal_masuk ? new Date(dataPegawai.tanggal_masuk).toLocaleDateString('en-GB') : '-'}
                                 </h2>
                                 <h2 className="font-medium mb-4 block text-black dark:text-white">
                                     <span className="inline-block w-32 md:w-40">Jabatan</span>

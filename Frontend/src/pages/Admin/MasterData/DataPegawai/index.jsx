@@ -230,7 +230,9 @@ const DataPegawai = () => {
                                             <p className="text-black dark:text-white">{data.tanggal_masuk}</p>
                                         </td>
                                         <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                                            <p className="text-black dark:text-white">{data.status}</p>
+                                          <p className="text-black dark:text-white">
+  {data.tanggal_masuk ? new Date(data.tanggal_masuk).toLocaleDateString('en-GB') : '-'}
+</p>
                                         </td>
                                         <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                                             <p className="text-black dark:text-white">{data.hak_akses}</p>

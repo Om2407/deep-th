@@ -17,6 +17,7 @@ const FormEditDataPegawai = () => {
     const [tanggalMasuk, setTanggalMasuk] = useState('');
     const [status, setStatus] = useState('');
     const [hakAkses, setHakAkses] = useState('');
+    const [designation, setDesignation] = useState(''); // LF-103
     const [msg, setMsg] = useState('');
     const { id } = useParams();
 
@@ -36,30 +37,20 @@ const FormEditDataPegawai = () => {
             formData.append('tanggal_masuk', tanggalMasuk);
             formData.append('status', status);
             formData.append('hak_akses', hakAkses);
+            formData.append('designation', designation); // LF-103
 
             const response = await axios.patch(`http://localhost:5000/data_pegawai/${id}`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
+                headers: { 'Content-Type': 'multipart/form-data' }
             });
             setMsg(response.data.msg);
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil',
-                timer: 1500,
-                text: response.data.msg
-            });
+            Swal.fire({ icon: 'success', title: 'Berhasil', timer: 1500, text: response.data.msg });
             navigate('/data-pegawai');
         } catch (error) {
             setMsg(error.response.data.msg);
-            Swal.fire({
-                icon: 'error',
-                title: 'Gagal',
-                text: error.response.data.msg
-            });
+            Swal.fire({ icon: 'error', title: 'Gagal', text: error.response.data.msg });
         }
     };
-    
+
     useEffect(() => {
         const getUserById = async () => {
             try {
@@ -73,26 +64,19 @@ const FormEditDataPegawai = () => {
                 setTanggalMasuk(data.tanggal_masuk);
                 setStatus(data.status);
                 setHakAkses(data.hak_akses);
+                setDesignation(data.designation || ''); // LF-103
             } catch (error) {
-                if (error.response) {
-                    setMsg(error.response.data.msg);
-                }
+                if (error.response) setMsg(error.response.data.msg);
             }
         };
         getUserById();
     }, [id]);
 
-    useEffect(() => {
-        dispatch(getMe());
-    }, [dispatch]);
+    useEffect(() => { dispatch(getMe()); }, [dispatch]);
 
     useEffect(() => {
-        if (isError) {
-            navigate('/login');
-        }
-        if (user && user.hak_akses !== 'admin') {
-            navigate('/dashboard');
-        }
+        if (isError) navigate('/login');
+        if (user && user.hak_akses !== 'admin') navigate('/dashboard');
     }, [isError, user, navigate]);
 
     return (
@@ -102,9 +86,7 @@ const FormEditDataPegawai = () => {
                 <div className='flex flex-col gap-9'>
                     <div className='rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark'>
                         <div className='border-b border-stroke py-4 px-6.5 dark:border-strokedark'>
-                            <h3 className='font-medium text-black dark:text-white'>
-                                Form Edit Data Pegawai
-                            </h3>
+                            <h3 className='font-medium text-black dark:text-white'>Form Edit Data Pegawai</h3>
                         </div>
                         <form onSubmit={updateUser}>
                             <p className='text-meta-1'>{msg}</p>
@@ -125,7 +107,6 @@ const FormEditDataPegawai = () => {
                                             className='w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary'
                                         />
                                     </div>
-
                                     <div className='w-full xl:w-1/2'>
                                         <label className='mb-2.5 block text-black dark:text-white'>
                                             Nama Lengkap <span className='text-meta-1'>*</span>
@@ -136,42 +117,43 @@ const FormEditDataPegawai = () => {
                                             name='namaPegawai'
                                             value={namaPegawai}
                                             onChange={(e) => setNamaPegawai(e.target.value)}
-                                            required={true}
+                                            required
                                             placeholder='Masukkan nama lengkap'
                                             className='w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary'
                                         />
                                     </div>
                                 </div>
+
                                 <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
                                     <div className='w-full xl:w-1/2'>
                                         <label className='mb-2.5 block text-black dark:text-white'>
                                             Username <span className='text-meta-1'>*</span>
                                         </label>
                                         <input
-                                            type='username'
+                                            type='text'
                                             id='username'
                                             name='username'
                                             value={username}
                                             onChange={(e) => setUsername(e.target.value)}
-                                            required={true}
+                                            required
                                             placeholder='Masukkan username'
                                             className='w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary'
                                         />
                                     </div>
-
                                     <div className='w-full xl:w-1/2'>
                                         <label className='mb-2.5 block text-black dark:text-white'>
                                             Jenis Kelamin <span className='text-meta-1'>*</span>
                                         </label>
                                         <div className='relative z-20 bg-transparent dark:bg-form-input'>
-                                            <select className='relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3 px-5 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary'
+                                            <select
+                                                className='relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3 px-5 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary'
                                                 id='jenisKelamin'
                                                 name='jenisKelamin'
                                                 value={jenisKelamin}
                                                 onChange={(e) => setJenisKelamin(e.target.value)}
-                                                required={true}
+                                                required
                                             >
-                                                <option value='' disabled={true}>Pilih jenis kelamin</option>
+                                                <option value='' disabled>Pilih jenis kelamin</option>
                                                 <option value='laki-laki'>Laki-Laki</option>
                                                 <option value='perempuan'>Perempuan</option>
                                             </select>
@@ -180,8 +162,8 @@ const FormEditDataPegawai = () => {
                                             </span>
                                         </div>
                                     </div>
-
                                 </div>
+
                                 <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
                                     <div className='w-full xl:w-1/2'>
                                         <label className='mb-2.5 block text-black dark:text-white'>
@@ -193,7 +175,7 @@ const FormEditDataPegawai = () => {
                                             name='jabatan'
                                             value={jabatan}
                                             onChange={(e) => setJabatan(e.target.value)}
-                                            required={true}
+                                            required
                                             placeholder='Masukkan jabatan'
                                             className='w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary'
                                         />
@@ -208,7 +190,7 @@ const FormEditDataPegawai = () => {
                                             name='tanggalMasuk'
                                             value={tanggalMasuk}
                                             onChange={(e) => setTanggalMasuk(e.target.value)}
-                                            required={true}
+                                            required
                                             className='w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary'
                                         />
                                     </div>
@@ -220,14 +202,15 @@ const FormEditDataPegawai = () => {
                                             Status <span className='text-meta-1'>*</span>
                                         </label>
                                         <div className='relative z-20 bg-transparent dark:bg-form-input'>
-                                            <select className='relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3 px-5 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary'
+                                            <select
+                                                className='relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3 px-5 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary'
                                                 id='status'
                                                 name='status'
                                                 value={status}
                                                 onChange={(e) => setStatus(e.target.value)}
-                                                required={true}
+                                                required
                                             >
-                                                <option value='' disabled={true}>Pilih status</option>
+                                                <option value='' disabled>Pilih status</option>
                                                 <option value='karyawan tetap'>Karyawan Tetap</option>
                                                 <option value='karyawan tidak tetap'>Karyawan Tidak Tetap</option>
                                             </select>
@@ -241,14 +224,15 @@ const FormEditDataPegawai = () => {
                                             Hak Akses <span className='text-meta-1'>*</span>
                                         </label>
                                         <div className='relative z-20 bg-transparent dark:bg-form-input'>
-                                            <select className='relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3 px-5 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary'
+                                            <select
+                                                className='relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3 px-5 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary'
                                                 id='hak_akses'
                                                 name='hak_akses'
                                                 value={hakAkses}
                                                 onChange={(e) => setHakAkses(e.target.value)}
-                                                required={true}
+                                                required
                                             >
-                                                <option value='' disabled={true}>Pilih hak akses</option>
+                                                <option value='' disabled>Pilih hak akses</option>
                                                 <option value='admin'>Admin</option>
                                                 <option value='pegawai'>Pegawai</option>
                                             </select>
@@ -259,16 +243,40 @@ const FormEditDataPegawai = () => {
                                     </div>
                                 </div>
 
+                                {/* LF-103: Designation dropdown */}
+                                <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
+                                    <div className='w-full xl:w-1/2'>
+                                        <label className='mb-2.5 block text-black dark:text-white'>
+                                            Designation
+                                        </label>
+                                        <div className='relative z-20 bg-transparent dark:bg-form-input'>
+                                            <select
+                                                className='relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3 px-5 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary'
+                                                id='designation'
+                                                name='designation'
+                                                value={designation}
+                                                onChange={(e) => setDesignation(e.target.value)}
+                                            >
+                                                <option value=''>Select Designation</option>
+                                                <option value='Mason'>Mason</option>
+                                                <option value='Electrician'>Electrician</option>
+                                                <option value='Plumber'>Plumber</option>
+                                                <option value='Supervisor'>Supervisor</option>
+                                                <option value='Helper'>Helper</option>
+                                            </select>
+                                            <span className='absolute top-1/2 right-4 z-30 -translate-y-1/2 text-2xl'>
+                                                <MdOutlineKeyboardArrowDown />
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div className='flex flex-col md:flex-row w-full gap-3 text-center'>
                                     <div>
-                                        <ButtonOne  >
-                                            <span>Perbarui</span>
-                                        </ButtonOne>
+                                        <ButtonOne><span>Perbarui</span></ButtonOne>
                                     </div>
-                                    <Link to="/data-pegawai" >
-                                        <ButtonTwo  >
-                                            <span>Kembali</span>
-                                        </ButtonTwo>
+                                    <Link to="/data-pegawai">
+                                        <ButtonTwo><span>Kembali</span></ButtonTwo>
                                     </Link>
                                 </div>
                             </div>
@@ -277,7 +285,7 @@ const FormEditDataPegawai = () => {
                 </div>
             </div>
         </Layout>
-    )
-}
+    );
+};
 
 export default FormEditDataPegawai;
