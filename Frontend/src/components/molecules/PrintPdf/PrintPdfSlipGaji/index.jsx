@@ -12,6 +12,16 @@ import {
 } from "../../../../config/redux/action";
 import { ButtonOne, ButtonTwo } from "../../../atoms";
 
+// LF-101: helper to format date as DD/MM/YYYY
+const formatDate = (dateStr) => {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+};
+
 const PrintPdfSlipGaji = () => {
     const componentRef = useRef();
     const dispatch = useDispatch();
@@ -87,30 +97,21 @@ const PrintPdfSlipGaji = () => {
                     </ButtonOne>
                 </div>
                 <div>
-                    <ButtonTwo
-                        onClick={() => navigate(-1)}
-                    >
+                    <ButtonTwo onClick={() => navigate(-1)}>
                         <span>Kembali</span>
                     </ButtonTwo>
                 </div>
-            </div >
-            <div ref={componentRef} >
+            </div>
+            <div ref={componentRef}>
                 {dataSlipGaji.map((data, index) => {
                     return (
                         <div key={index} className="w-200% h-100% p-10 bg-white dark:bg-meta-4">
                             <div className="flex items-center gap-24 object-cover border-b-4 border-black dark:border-white">
-                                <img className="w-35"
-                                    src={LogoSipeka}
-                                    title="Logo SiPeKa"
-                                    alt="Logo SiPeKa" />
-                                <h1 className="text-black text-2xl font-bold boder  dark:text-white">
+                                <img className="w-35" src={LogoSipeka} title="Logo SiPeKa" alt="Logo SiPeKa" />
+                                <h1 className="text-black text-2xl font-bold boder dark:text-white">
                                     PT. Humpuss Karbometil Selulosa
                                 </h1>
-                                <img className="w-35"
-                                    src={LogoPt}
-                                    title="Logo PT.Humpuss Karbometil Selulosa"
-                                    alt="Logo PT.Humpuss Karbometil Selulosa"
-                                />
+                                <img className="w-35" src={LogoPt} title="Logo PT.Humpuss Karbometil Selulosa" alt="Logo PT.Humpuss Karbometil Selulosa" />
                             </div>
                             <h1 className="text-center text-black dark:text-white my-4 text-xl font-medium boder py-2">
                                 Daftar Gaji Pegawai
@@ -118,25 +119,21 @@ const PrintPdfSlipGaji = () => {
                             <div className="w-full md:text-lg">
                                 <h2 className="font-medium mb-4 block text-black dark:text-white">
                                     <span className="inline-block w-32 md:w-40">Nama Pegawai</span>
-                                    <span className="pl-[-8] md:pl-0"></span>
                                     <span className="inline-block w-7">:</span>
                                     {name}
                                 </h2>
                                 <h2 className="font-medium mb-4 block text-black dark:text-white">
                                     <span className="inline-block w-32 md:w-40">NIK</span>
-                                    <span className="pl-[-8] md:pl-0"></span>
                                     <span className="inline-block w-7">:</span>
                                     {data.nik}
                                 </h2>
                                 <h2 className="font-medium mb-4 block text-black dark:text-white">
                                     <span className="inline-block w-32 md:w-40">Jabatan</span>
-                                    <span className="pl-[-8] md:pl-0"></span>
                                     <span className="inline-block w-7">:</span>
                                     {data.jabatan}
                                 </h2>
                                 <h2 className="font-medium mb-4 block text-black dark:text-white">
                                     <span className="inline-block w-32 md:w-40">Bulan</span>
-                                    <span className="pl-[-8] md:pl-0"></span>
                                     <span className="inline-block w-7">:</span>
                                     {month}
                                 </h2>
@@ -144,7 +141,6 @@ const PrintPdfSlipGaji = () => {
                                     <span className="inline-block w-32 md:w-40">Tahun</span>
                                     <span className="inline-block w-7">:</span>
                                     {year}
-                                    <span className="pl-[-8] md:pl-0"></span>
                                 </h2>
                             </div>
 
@@ -152,71 +148,36 @@ const PrintPdfSlipGaji = () => {
                                 <table className='w-full table-auto'>
                                     <thead>
                                         <tr className='bg-white text-left dark:bg-meta-4'>
-                                            <th className='py-4 border-t border-l font-medium text-center text-black dark:text-white'>
-                                                No
-                                            </th>
-                                            <th className='py-4 px-4 border-t border-l text-center font-medium text-black dark:text-white'>
-                                                Keterangan
-                                            </th>
-                                            <th className='py-4 px-4 border-t text-center border-l border-r font-medium text-black dark:text-white'>
-                                                Jumlah
-                                            </th>
+                                            <th className='py-4 border-t border-l font-medium text-center text-black dark:text-white'>No</th>
+                                            <th className='py-4 px-4 border-t border-l text-center font-medium text-black dark:text-white'>Keterangan</th>
+                                            <th className='py-4 px-4 border-t text-center border-l border-r font-medium text-black dark:text-white'>Jumlah</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr className='dark:border-white'>
-                                            <td className='border-b border-black border-t border-l dark:border-white py-5 text-center text-black dark:text-white'>
-                                                {index + 1}
-                                            </td>
-                                            <td className='border-b border-black border-t border-l dark:border-white py-5 px-4 text-black dark:text-white'>
-                                                Gaji Pokok
-                                            </td>
-                                            <td className='border-b border-black border-t border-l border-r dark:border-white py-5 px-4 text-black dark:text-white'>
-                                                Rp. {data.gaji_pokok}
-                                            </td>
+                                            <td className='border-b border-black border-t border-l dark:border-white py-5 text-center text-black dark:text-white'>{index + 1}</td>
+                                            <td className='border-b border-black border-t border-l dark:border-white py-5 px-4 text-black dark:text-white'>Gaji Pokok</td>
+                                            <td className='border-b border-black border-t border-l border-r dark:border-white py-5 px-4 text-black dark:text-white'>Rp. {data.gaji_pokok}</td>
                                         </tr>
-                                        <tr className=' dark:border-white'>
-                                            <td className='border-b border-black border-t border-l dark:border-white py-5 text-center text-black dark:text-white'>
-                                                {index + 2}
-                                            </td>
-                                            <td className='border-b border-black border-t border-l dark:border-white py-5 px-4 text-black dark:text-white'>
-                                                Tunjangan Transportasi
-                                            </td>
-                                            <td className='border-b border-black border-t border-l border-r dark:border-white py-5 px-4 text-black dark:text-white'>
-                                                Rp. {data.tj_transport}
-                                            </td>
+                                        <tr className='dark:border-white'>
+                                            <td className='border-b border-black border-t border-l dark:border-white py-5 text-center text-black dark:text-white'>{index + 2}</td>
+                                            <td className='border-b border-black border-t border-l dark:border-white py-5 px-4 text-black dark:text-white'>Tunjangan Transportasi</td>
+                                            <td className='border-b border-black border-t border-l border-r dark:border-white py-5 px-4 text-black dark:text-white'>Rp. {data.tj_transport}</td>
                                         </tr>
-                                        <tr className=' dark:border-white'>
-                                            <td className='border-b border-black border-t border-l dark:border-white py-5 text-center text-black dark:text-white'>
-                                                {index + 3}
-                                            </td>
-                                            <td className='border-b border-black border-t border-l dark:border-white py-5 px-4 text-black dark:text-white'>
-                                                Uang Makan
-                                            </td>
-                                            <td className='border-b border-black border-t border-l border-r dark:border-white py-5 px-4 text-black dark:text-white'>
-                                                Rp. {data.uang_makan}
-                                            </td>
+                                        <tr className='dark:border-white'>
+                                            <td className='border-b border-black border-t border-l dark:border-white py-5 text-center text-black dark:text-white'>{index + 3}</td>
+                                            <td className='border-b border-black border-t border-l dark:border-white py-5 px-4 text-black dark:text-white'>Uang Makan</td>
+                                            <td className='border-b border-black border-t border-l border-r dark:border-white py-5 px-4 text-black dark:text-white'>Rp. {data.uang_makan}</td>
                                         </tr>
-                                        <tr className=' dark:border-white'>
-                                            <td className='border-b border-black border-t border-l dark:border-white py-5 text-center text-black dark:text-white'>
-                                                {index + 4}
-                                            </td>
-                                            <td className='border-b border-black border-t border-l dark:border-white py-5 px-4 text-black dark:text-white'>
-                                                Potongan
-                                            </td>
-                                            <td className='border-b border-black border-t border-l border-r dark:border-white py-5 px-4 text-black dark:text-white'>
-                                                Rp. {data.potongan}
-                                            </td>
+                                        <tr className='dark:border-white'>
+                                            <td className='border-b border-black border-t border-l dark:border-white py-5 text-center text-black dark:text-white'>{index + 4}</td>
+                                            <td className='border-b border-black border-t border-l dark:border-white py-5 px-4 text-black dark:text-white'>Potongan</td>
+                                            <td className='border-b border-black border-t border-l border-r dark:border-white py-5 px-4 text-black dark:text-white'>Rp. {data.potongan}</td>
                                         </tr>
-                                        <tr className=' dark:border-white'>
-                                            <td className='border-b border-black border-t border-l dark:border-white py-5 px-4 text-black dark:text-white'>
-                                            </td>
-                                            <td className='font-medium border-b border-black dark:border-white py-5 px-2 text-right text-black dark:text-white'>
-                                                Total Gaji :
-                                            </td>
-                                            <td className='font-medium border-b border-black border-t border-l border-r dark:border-white py-5 px-4 text-black dark:text-white'>
-                                                Rp. {data.total}
-                                            </td>
+                                        <tr className='dark:border-white'>
+                                            <td className='border-b border-black border-t border-l dark:border-white py-5 px-4 text-black dark:text-white'></td>
+                                            <td className='font-medium border-b border-black dark:border-white py-5 px-2 text-right text-black dark:text-white'>Total Gaji :</td>
+                                            <td className='font-medium border-b border-black border-t border-l border-r dark:border-white py-5 px-4 text-black dark:text-white'>Rp. {data.total}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -224,23 +185,21 @@ const PrintPdfSlipGaji = () => {
                             <div className="py-6 flex justify-between items-center">
                                 <div className="font-medium text-black dark:text-white">
                                     <span className="p-6">Pegawai</span>
-                                    <br />
-                                    <br />
-                                    <br />
-                                    <br />
+                                    <br /><br /><br /><br />
                                     <span>{name}</span>
                                 </div>
                                 <div className="font-medium text-black dark:text-white">
-                                    <span className="text-right">Karawang, {`${new Date().getDate()} ${bulan} ${tahun}`}</span>
+                                    {/* LF-101: DD/MM/YYYY format */}
+                                    <span className="text-right">Karawang, {formatDate(new Date().toISOString())}</span>
                                     <br />
                                     <span>Finance</span>
-                                    <br />
-                                    <br />
+                                    <br /><br />
                                     <span className="p-8 italic text-black dark:text-white">Tanda Tangan</span>
                                 </div>
                             </div>
                             <div className="italic text-black dark:text-white mt-30">
-                                Dicetak Pada : {`${new Date().getDate()} ${bulan} ${tahun}`}
+                                {/* LF-101: DD/MM/YYYY format */}
+                                Dicetak Pada : {formatDate(new Date().toISOString())}
                             </div>
                         </div>
                     );
