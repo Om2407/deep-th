@@ -199,6 +199,7 @@ const DataPegawai = () => {
                                 <th className="py-4 px-4 font-medium text-black dark:text-white">Tanggal Masuk</th>
                                 <th className="py-4 px-4 font-medium text-black dark:text-white">Status</th>
                                 <th className="py-4 px-4 font-medium text-black dark:text-white">Hak Akses</th>
+                                <th className="py-4 px-4 font-medium text-black dark:text-white">Designation</th>
                                 <th className="py-4 px-4 font-medium text-black dark:text-white">Aksi</th>
                             </tr>
                         </thead>
@@ -233,6 +234,9 @@ const DataPegawai = () => {
                                         </td>
                                         <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                                             <p className="text-black dark:text-white">{data.hak_akses}</p>
+                                        </td>
+                                        <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                                            <p className="text-black dark:text-white">{data.designation}</p>
                                         </td>
                                         <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                                             <div className="flex items-center space-x-3.5">
