@@ -48,15 +48,19 @@ const DataPegawai = db.define('data_pegawai', {
         allowNull: false
     },
     url: DataTypes.STRING,
-    hak_akses: {
+   hak_akses: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
             notEmpty: true
         }
+    },
+  designation: {                          
+        type: DataTypes.STRING(50),
+        allowNull: true
     }
-}, {
+}, {                   
     freezeTableName: true
-});
+});                     
 
 export default DataPegawai;

@@ -9,7 +9,7 @@ export const getDataPegawai = async (req, res) => {
             attributes: [
                 'id', 'nik', 'nama_pegawai',
                 'jenis_kelamin', 'jabatan', 'tanggal_masuk',
-                'status', 'photo', 'hak_akses'
+                'status', 'photo', 'hak_akses', 'designation'  // ✅ designation added
             ]
         });
         res.status(200).json(response);
@@ -25,7 +25,7 @@ export const getDataPegawaiByID = async (req, res) => {
             attributes: [
                 'id', 'nik', 'nama_pegawai',
                 'jenis_kelamin', 'jabatan', 'username', 'tanggal_masuk',
-                'status', 'photo', 'hak_akses'
+                'status', 'photo', 'hak_akses', 'designation'  // ✅ designation added
             ],
             where: {
                 id: req.params.id
@@ -48,7 +48,7 @@ export const getDataPegawaiByNik = async (req, res) => {
             attributes: [
                 'id', 'nik', 'nama_pegawai',
                 'jenis_kelamin', 'jabatan', 'tanggal_masuk',
-                'status', 'photo', 'hak_akses'
+                'status', 'photo', 'hak_akses', 'designation'  // ✅ designation added
             ],
             where: {
                 nik: req.params.nik
@@ -72,7 +72,7 @@ export const getDataPegawaiByName = async (req, res) => {
             attributes: [
                 'id', 'nik', 'nama_pegawai',
                 'jenis_kelamin', 'jabatan', 'tanggal_masuk',
-                'status', 'photo', 'hak_akses'
+                'status', 'photo', 'hak_akses', 'designation'  // ✅ designation added
             ],
             where: {
                 nama_pegawai: req.params.name
@@ -94,7 +94,7 @@ export const createDataPegawai = async (req, res) => {
         nik, nama_pegawai,
         username, password, confPassword, jenis_kelamin,
         jabatan, tanggal_masuk,
-        status, hak_akses
+        status, hak_akses, designation  // ✅ designation added
     } = req.body;
 
     if (password !== confPassword) {
@@ -139,7 +139,8 @@ export const createDataPegawai = async (req, res) => {
                 status: status,
                 photo: fileName,
                 url: url,
-                hak_akses: hak_akses
+                hak_akses: hak_akses,
+                designation: designation  // ✅ designation added
             });
 
             res.status(201).json({ success: true, message: "Registrasi Berhasil" });
@@ -159,12 +160,12 @@ export const updateDataPegawai = async (req, res) => {
         }
     });
 
-    if (!pegawai) return res.staus(404).json({ msg: "Data pegawai tidak ditemukan" });
+    if (!pegawai) return res.status(404).json({ msg: "Data pegawai tidak ditemukan" });
     const {
         nik, nama_pegawai,
         username, jenis_kelamin,
         jabatan, tanggal_masuk,
-        status, hak_akses
+        status, hak_akses, designation  // ✅ designation added
     } = req.body;
 
     try {
@@ -176,7 +177,8 @@ export const updateDataPegawai = async (req, res) => {
             jabatan: jabatan,
             tanggal_masuk: tanggal_masuk,
             status: status,
-            hak_akses: hak_akses
+            hak_akses: hak_akses,
+            designation: designation  // ✅ designation added
         }, {
             where: {
                 id: pegawai.id
