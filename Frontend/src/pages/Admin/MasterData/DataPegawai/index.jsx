@@ -10,6 +10,30 @@ import { deleteDataPegawai, getDataPegawai, getMe } from '../../../../config/red
 import { BiSearch } from 'react-icons/bi';
 import { MdKeyboardDoubleArrowLeft, MdKeyboardDoubleArrowRight, MdOutlineKeyboardArrowDown } from 'react-icons/md';
 
+const exportToCSV = () => {
+    const headers = ['No', 'NIK', 'Nama Pegawai', 'Jenis Kelamin', 'Designation', 'Status', 'Tanggal Masuk'];
+    const rows = filteredDataPegawai.map((data, index) => [
+        index + 1,
+        data.nik,
+        data.nama_pegawai,
+        data.jenis_kelamin,
+        data.designation || '-',
+        data.status,
+        data.tanggal_masuk ? new Date(data.tanggal_masuk).toLocaleDateString('en-GB') : '-'
+    ]);
+
+    const csvContent = [headers, ...rows]
+        .map(row => row.map(cell => `"${cell}"`).join(','))
+        .join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'data_pegawai.csv';
+    link.click();
+    URL.revokeObjectURL(url);
+};
 const ITEMS_PER_PAGE = 4;
 
 const DataPegawai = () => {
@@ -147,8 +171,20 @@ const DataPegawai = () => {
     return (
         <Layout>
             <Breadcrumb pageName="Data Pegawai" />
-            <Link to="/data-pegawai/form-data-pegawai/add">
-                <ButtonOne>
+          <div className="flex gap-3 mb-4">
+    <Link to="/data-pegawai/form-data-pegawai/add">
+        <ButtonOne>
+            <span>Tambah Pegawai</span>
+            <span><FaPlus /></span>
+        </ButtonOne>
+    </Link>
+    <button
+        onClick={exportToCSV}
+        className="inline-flex items-center gap-2 rounded bg-success py-2 px-4 text-white font-medium hover:bg-opacity-90"
+    >
+        Download CSV
+    </button>
+</div>
                     <span>Tambah Pegawai</span>
                     <span>
                         <FaPlus />
